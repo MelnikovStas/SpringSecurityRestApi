@@ -1,6 +1,7 @@
-package spring_mvc_boot.springBoot.SpringMVCApp.service;
+package ru.kata.spring.boot_security.demo.service;
 
-import spring_mvc_boot.springBoot.SpringMVCApp.models.User;
+
+import ru.kata.spring.boot_security.demo.model.User;
 
 import java.util.List;
 
@@ -18,4 +19,5 @@ public interface UserService {
     List<User> findAll();
 
 
+    User findByUsername(String username);
 }

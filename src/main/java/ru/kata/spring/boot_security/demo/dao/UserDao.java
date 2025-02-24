@@ -1,6 +1,7 @@
-package spring_mvc_boot.springBoot.SpringMVCApp.dao;
+package ru.kata.spring.boot_security.demo.dao;
 
-import spring_mvc_boot.springBoot.SpringMVCApp.models.User;
+
+import ru.kata.spring.boot_security.demo.model.User;
 
 import java.util.List;
 
@@ -14,4 +15,5 @@ public interface UserDao {
     void delete(int id);
 
     List<User> index();
+
 }

@@ -5,18 +5,27 @@
     <title>User</title>
 </head>
 <body>
+<table border="2">
+    <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Password</th>
+        <th>Actions</th>
 
-<p th:text="${user.getName()}">VALUE</p>
-<p th:text="${user.getId()}">VALUE</p>
-
-<a th:href="@{/users/{id}/edit(id=${user.getId()})}">Edit</a>
-
-<form th:method="POST" th:action="@{/users/delete}">
-    <input type="hidden" th:name=id th:value="${user.id}">
-    <br/>
-    <hr/>
-    <input type="submit" value=Delete>
-</form>
-
+    </tr>
+    <tr>
+        <td th:text="${user.id}">ID</td>
+        <td th:text="${user.username}">Username</td>
+        <td th:text="${user.password}">Password</td>
+        <td>
+            <a th:href="@{/admin/{id}/edit(id=${user.id})}">Edit</a>
+            <form th:method="POST" th:action="@{/admin/delete}" style="display: inline;">
+                <input type="hidden" name="id" th:value="${user.id}">
+                <input type="submit" value="Delete">
+            </form>
+        </td>
+    </tr>
+</table>
+<div th:replace="~{logout :: logout}"></div>
 </body>
 </html>

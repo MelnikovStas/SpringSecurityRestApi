@@ -1,14 +1,17 @@
-package spring_mvc_boot.springBoot.SpringMVCApp.controllers;
+package ru.kata.spring.boot_security.demo.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import spring_mvc_boot.springBoot.SpringMVCApp.models.User;
-import spring_mvc_boot.springBoot.SpringMVCApp.service.UserService;
+import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.service.UserService;
+
+import java.security.Principal;
+import java.util.List;
 
 @Controller
-@RequestMapping("/users")
+@RequestMapping()
 public class UserController {
 
     private final UserService userService;
@@ -18,42 +21,50 @@ public class UserController {
     }
 
 
-    @GetMapping()
+    @GetMapping("/admin")
     public String index(Model model) {
-        model.addAttribute("users", userService.findAll());
-        return "index";
+        List<User> users = userService.findAll();
+        System.out.println("User count : " + users.size());
+        model.addAttribute("users", users);
+        return "admin";
     }
 
-    @GetMapping("/user")//страница со всеми юзерами
-    public String user(@RequestParam("id") int userId, Model model) {
-        User user = userService.findById(userId);
+    @GetMapping("/user")
+    public String showUserInfo(Model model, Principal principal) {
+        String username = principal.getName();
+        User user = userService.findByUsername(username);
+        model.addAttribute("user", user);
+        return "user";
+    }
+
+    @GetMapping("/admin/user")//страница со всеми юзерами
+    public String userShow(@RequestParam("id") int id, Model model) {
+        User user = userService.findById(id);
         model.addAttribute("user", user);
         return "show";
     }
 
-    @GetMapping("/new")
-    public String newUser(@ModelAttribute("user") User user) {
+
+    @GetMapping("/admin/new")
+    public String newUser(Model model) {
+        model.addAttribute("user", new User());
         return "new";
     }
 
-    @PostMapping("/new")
-    public String create(@ModelAttribute("user") User user,
-                         BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "redirect:/users";
-        }
+    @PostMapping("/admin/new")
+    public String create(@ModelAttribute("user") User user) {
 
         userService.create(user);
-        return "redirect:/users";
+        return "redirect:/admin";
     }
 
-    @GetMapping("/{id}/edit")
+    @GetMapping("/admin/{id}/edit")
     public String edit(@PathVariable int id, Model model) {
         model.addAttribute("user", userService.findById(id));
         return "edit";
     }
 
-    @PostMapping("/edit")
+    @PostMapping("/admin/edit")
     public String update(@ModelAttribute("user") User user,
                          BindingResult bindingResult, @RequestParam("id") int id) {
         if (bindingResult.hasErrors()) {
@@ -61,15 +72,14 @@ public class UserController {
         }
 
         userService.update(user, id);
-        return "redirect:/users";
+        return "redirect:/admin";
     }
 
-    @PostMapping("/delete")
+    @PostMapping("/admin/delete")
     public String delete(@RequestParam("id") int id, Model model) {
         User user = userService.findById(id);
         model.addAttribute("user", user);
         userService.delete(user, id);
-        return "redirect:/users";
+        return "redirect:/admin";
     }
-
 }

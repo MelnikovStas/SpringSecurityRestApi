@@ -1,11 +1,12 @@
-package spring_mvc_boot.springBoot.SpringMVCApp.service;
+package ru.kata.spring.boot_security.demo.service;
 
-import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import spring_mvc_boot.springBoot.SpringMVCApp.dao.UserDao;
-import spring_mvc_boot.springBoot.SpringMVCApp.models.User;
+import ru.kata.spring.boot_security.demo.dao.UserDao;
+import ru.kata.spring.boot_security.demo.model.User;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -49,4 +50,15 @@ public class UserServiceImpl implements UserService {
     public List<User> findAll() {
         return userDao.index();
     }
+
+    @Override
+    public User findByUsername(String username) {
+        if ("user".equals(username)) {
+            return new User(1, "user", "user");
+        } else if ("admin".equals(username)) {
+            return new User(2, "admin", "admin");
+        }
+        return null;
+    }
+
 }

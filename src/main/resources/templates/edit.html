@@ -6,19 +6,17 @@
 </head>
 <body>
 
-<form th:method="POST" th:action="@{/users/edit}">
+<form th:method="POST" th:action="@{/admin/edit}">
     <input type="hidden" th:name=id th:value="${user.id}">
     <label for="name">Enter name: </label>
-    <input type="text" th:field="*{user.name}" id="name"/>
+    <input type="text" th:field="*{user.username}" id="name"/>
     <br/>
-    <label for="email">Enter email: </label>
-    <input type="text" th:field="*{user.email}" id="email"/>
+    <label for="password">Enter password: </label>
+    <input type="text" th:field="*{user.password}" id="password"/>
     <br/>
-    <label for="age">Enter age : </label>
-    <input type="number" th:field="*{user.age}" id="age"/>
-    <br/>
+
     <input type="submit" value="Update"/>
 </form>
-
+<div th:replace="~{logout :: logout}"></div>
 </body>
 </html>
