@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.security.UserDetailsImpl;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
 import java.security.Principal;
@@ -20,11 +21,9 @@ public class UserController {
         this.userService = userService;
     }
 
-
     @GetMapping("/admin")
     public String index(Model model) {
         List<User> users = userService.findAll();
-        System.out.println("User count : " + users.size());
         model.addAttribute("users", users);
         return "admin";
     }
@@ -32,18 +31,18 @@ public class UserController {
     @GetMapping("/user")
     public String showUserInfo(Model model, Principal principal) {
         String username = principal.getName();
-        User user = userService.findByUsername(username);
+        UserDetailsImpl userDetails = (UserDetailsImpl) userService.loadUserByUsername(username);
+        User user = userDetails.getUser();
         model.addAttribute("user", user);
         return "user";
     }
 
-    @GetMapping("/admin/user")//страница со всеми юзерами
-    public String userShow(@RequestParam("id") int id, Model model) {
+    @GetMapping("/admin/user")
+    public String userShow(@RequestParam("id") long id, Model model) { // Используем long вместо int
         User user = userService.findById(id);
         model.addAttribute("user", user);
         return "show";
     }
-
 
     @GetMapping("/admin/new")
     public String newUser(Model model) {
@@ -53,30 +52,28 @@ public class UserController {
 
     @PostMapping("/admin/new")
     public String create(@ModelAttribute("user") User user) {
-
         userService.create(user);
         return "redirect:/admin";
     }
 
     @GetMapping("/admin/{id}/edit")
-    public String edit(@PathVariable int id, Model model) {
+    public String edit(@PathVariable long id, Model model) { // Используем long вместо int
         model.addAttribute("user", userService.findById(id));
         return "edit";
     }
 
     @PostMapping("/admin/edit")
     public String update(@ModelAttribute("user") User user,
-                         BindingResult bindingResult, @RequestParam("id") int id) {
+                         BindingResult bindingResult, @RequestParam("id") long id) { // Используем long вместо int
         if (bindingResult.hasErrors()) {
             return "edit";
         }
-
         userService.update(user, id);
         return "redirect:/admin";
     }
 
     @PostMapping("/admin/delete")
-    public String delete(@RequestParam("id") int id, Model model) {
+    public String delete(@RequestParam("id") long id, Model model) { // Используем long вместо int
         User user = userService.findById(id);
         model.addAttribute("user", user);
         userService.delete(user, id);

@@ -1,64 +1,58 @@
 package ru.kata.spring.boot_security.demo.service;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.kata.spring.boot_security.demo.dao.UserDao;
 import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.repository.UserRepository;
+import ru.kata.spring.boot_security.demo.security.UserDetailsImpl;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserDetailsService ,UserService {
 
-    private final UserDao userDao;
+    private final UserRepository userRepository;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao) {
-        this.userDao = userDao;
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    @Transactional
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user =  userRepository.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        return new UserDetailsImpl(user);
+    }
+
     @Override
     public void create(User user) {
-        userDao.save(user);
+        userRepository.save(user);
     }
 
-    @Transactional
     @Override
-    public void update(User user, int id) {
-
-        userDao.update(id, user);
-
+    public void update(User user, long id) {
+        user.setId(id);
+        userRepository.save(user);
     }
 
-    @Transactional
     @Override
-    public void delete(User user, int id) {
-        userDao.delete(id);
+    public void delete(User user, long id) {
+        userRepository.deleteById((long) id);
     }
 
-    @Transactional
     @Override
-    public User findById(int id) {
-        return userDao.show(id);
-    }
-
-    @Transactional
-    @Override
-    public List<User> findAll() {
-        return userDao.index();
+    public User findById(long id) {
+        return userRepository.findById((long) id).orElse(null);
     }
 
     @Override
-    public User findByUsername(String username) {
-        if ("user".equals(username)) {
-            return new User(1, "user", "user");
-        } else if ("admin".equals(username)) {
-            return new User(2, "admin", "admin");
-        }
-        return null;
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
-
 }
