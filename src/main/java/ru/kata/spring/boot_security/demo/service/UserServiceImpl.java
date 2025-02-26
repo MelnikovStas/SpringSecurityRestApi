@@ -12,7 +12,7 @@ import ru.kata.spring.boot_security.demo.security.UserDetailsImpl;
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserDetailsService ,UserService {
+public class UserServiceImpl implements UserDetailsService, UserService {
 
     private final UserRepository userRepository;
 
@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserDetailsService ,UserService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user =  userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
@@ -43,12 +43,12 @@ public class UserServiceImpl implements UserDetailsService ,UserService {
 
     @Override
     public void delete(User user, long id) {
-        userRepository.deleteById((long) id);
+        userRepository.deleteById(id);
     }
 
     @Override
     public User findById(long id) {
-        return userRepository.findById((long) id).orElse(null);
+        return userRepository.findById(id).orElse(null);
     }
 
     @Override
