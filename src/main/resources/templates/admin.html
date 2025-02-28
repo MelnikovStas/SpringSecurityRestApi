@@ -3,90 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Panel</title>
-    <!-- Подключаем Bootstrap для стилей и вкладок -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="container mt-4">
-    <h1>Admin Panel "я уже начал подрубать Bootstrap, надеюсь это не помешает "</h1>
 
-    <!-- Вкладки -->
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
-        <!-- Вкладка "Пользователи" -->
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab" aria-controls="users" aria-selected="true">
-                Пользователи
-            </button>
-        </li>
-        <!-- Вкладка "Создать пользователя" -->
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="create-user-tab" data-bs-toggle="tab" data-bs-target="#create-user" type="button" role="tab" aria-controls="create-user" aria-selected="false">
-                Создать пользователя
-            </button>
-        </li>
-    </ul>
+<!-- Навигационная панель -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#" th:text="${username} ?: 'Admin'"></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button type="submit" class="nav-link btn btn-link" style="border: none; background: none; cursor: pointer;">Выйти</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
-    <!-- Содержимое вкладок -->
-    <div class="tab-content" id="myTabContent">
-        <!-- Вкладка "Пользователи" -->
-        <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="users-tab">
-            <h2 class="mt-3">Список пользователей</h2>
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Имя пользователя</th>
-                    <th>Возраст</th>
-                    <th>Роль</th>
-                    <th>Действия</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- Цикл для отображения пользователей -->
-                <tr th:each="user : ${users}">
-                    <td th:text="${user.id}"></td>
-                    <td th:text="${user.username}"></td>
-                    <td th:text="${user.age}"></td>
-                    <td th:text="${user.role}"></td>
-                    <td>
-                        <a th:href="@{/admin/{id}/edit(id=${user.id})}" class="btn btn-warning btn-sm">Редактировать</a>
-                        <a th:href="@{/admin/delete(id=${user.id})}" class="btn btn-danger btn-sm">Удалить</a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+<!-- Основное содержимое -->
+<div class="container-fluid">
+    <div class="row">
+        <!-- Боковая панель -->
+        <div class="col-md-3 bg-light p-2" style="height: 100vh;">
+            <ul class="list-group">
+                <li class="list-group-item active" id="adminTabBtn" onclick="showTab('admin')">Админ</li>
+                <li class="list-group-item" id="userTabBtn" onclick="showTab('user')">Юзер</li>
+            </ul>
         </div>
 
-        <!-- Вкладка "Создать пользователя" -->
-        <div class="tab-pane fade" id="create-user" role="tabpanel" aria-labelledby="create-user-tab">
-            <h2 class="mt-3">Создать нового пользователя</h2>
-            <form th:action="@{/admin/new}" method="post">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Имя пользователя</label>
-                    <input type="text" class="form-control" id="username" name="username" required>
+        <!-- Основная панель -->
+        <div class="col-md-9 p-4">
+            <h1>Admin Panel</h1>
+
+            <!-- Вкладки -->
+            <ul class="nav nav-tabs" id="adminTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button">Пользователи</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="create-user-tab" data-bs-toggle="tab" data-bs-target="#create-user" type="button">Создать пользователя</button>
+                </li>
+            </ul>
+
+            <div class="tab-content mt-3">
+                <!-- Вкладка "Пользователи" -->
+                <div class="tab-pane fade show active" id="users">
+                    <h2>Список пользователей</h2>
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя пользователя</th>
+                            <th>Возраст</th>
+                            <th>Роли</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.id}"></td>
+                            <td th:text="${user.username}"></td>
+                            <td th:text="${user.age}"></td>
+                            <td>
+                                <span th:each="role : ${user.roles}" th:text="${role.role} + ' '"></span>
+                            </td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="openEditModal([[${user.id}]], '[[${user.username}]]', [[${user.age}]], [[${user.roles}]])">Редактировать</button>
+                                <form th:action="@{/admin/delete}" method="post">
+                                    <input type="hidden" name="id" th:value="${user.id}" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="mb-3">
-                    <label for="age" class="form-label">Возраст</label>
-                    <input type="number" class="form-control" id="age" name="age" required>
+
+                <!-- Вкладка "Создать пользователя" -->
+                <div class="tab-pane fade" id="create-user">
+                    <h2>Создать нового пользователя</h2>
+                    <!-- Временный вывод списка ролей для проверки -->
+                    <div th:if="${allRoles != null}">
+                        <h3>Available Roles:</h3>
+                        <ul>
+                            <li th:each="role : ${allRoles}" th:text="${role.role}"></li>
+                        </ul>
+                    </div>
+                    <form th:action="@{/admin/new}" method="post" class="border p-4 rounded bg-light col-6 mx-auto">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="age" class="form-label">Age</label>
+                            <input type="number" class="form-control" id="age" name="age" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="roles" class="form-label">Roles</label>
+                            <select class="form-control" id="roles" name="roleIds" multiple required>
+                                <option th:each="role : ${allRoles}" th:value="${role.id}" th:text="${role.role}"></option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">Add new user</button>
+                    </form>
                 </div>
-                <div class="mb-3">
-                    <label for="role" class="form-label">Роль</label>
-                    <select class="form-control" id="role" name="role" required>
-                        <option value="USER">USER</option>
-                        <option value="ADMIN">ADMIN</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Пароль</label>
-                    <input type="password" class="form-control" id="password" name="password" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Создать</button>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Подключаем Bootstrap JS для работы вкладок -->
+<!-- Модальное окно редактирования -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel">Редактирование пользователя</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editUserForm" th:action="@{/admin/edit}" method="post">
+                    <input type="hidden" id="edit-id" name="id">
+                    <div class="mb-3">
+                        <label for="edit-username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="edit-username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-age" class="form-label">Age</label>
+                        <input type="number" class="form-control" id="edit-age" name="age" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-roles" class="form-label">Roles</label>
+                        <select class="form-control" id="edit-roles" name="roleIds" multiple required>
+                            <option th:each="role : ${allRoles}" th:value="${role.id}" th:text="${role.role}"></option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100">Сохранить изменения</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Подключаем Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Скрипт для модального окна редактирования -->
+<script>
+    function openEditModal(id, username, age, roleIds) {
+        document.getElementById('edit-id').value = id;
+        document.getElementById('edit-username').value = username;
+        document.getElementById('edit-age').value = age;
+
+        // Очищаем предыдущие выбранные роли
+        const rolesSelect = document.getElementById('edit-roles');
+        Array.from(rolesSelect.options).forEach(option => option.selected = false);
+
+        // Устанавливаем выбранные роли
+        roleIds.forEach(roleId => {
+            const option = Array.from(rolesSelect.options).find(opt => opt.value == roleId);
+            if (option) {
+                option.selected = true;
+            }
+        });
+
+        var editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+        editModal.show();
+    }
+</script>
+
 </body>
 </html>
