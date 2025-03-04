@@ -39,7 +39,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessUrl("/login")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
-                .permitAll();
+                .permitAll()
+                .and()
+                .sessionManagement() // Настройка управления сессиями
+                .sessionFixation().migrateSession() // Защита от атак фиксации сессии
+                .maximumSessions(1) // Ограничение: только одна активная сессия на пользователя
+                .expiredUrl("/login?expired"); // Перенаправление на страницу логина при истечении сессии
     }
 
 

@@ -27,18 +27,18 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
-        return user; // Возвращаем объект User, так как он реализует UserDetails
+        return user;
     }
     @Transactional
     @Override
     public void create(User user) {
-        userRepository.save(user); // Пароль сохраняется как есть (без кодировки)
+        userRepository.save(user);
     }
     @Transactional
     @Override
     public void update(User user, long id) {
         user.setId(id);
-        userRepository.save(user); // Пароль сохраняется как есть (без кодировки)
+        userRepository.save(user);
     }
     @Transactional
     @Override

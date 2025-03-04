@@ -13,6 +13,7 @@ import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping()
@@ -29,11 +30,18 @@ public class UserController {
     @GetMapping("/admin")
     public String index(Model model, Principal principal) {
         List<User> users = userService.findAll();
+        List<Role> roles = roleRepository.findAll();
         model.addAttribute("users", users);
+        model.addAttribute("allRoles", roles);
 
         // Получаем текущего пользователя
         String username = principal.getName();
         User currentUser = (User) userService.loadUserByUsername(username);
+
+        // Отладочный вывод
+        System.out.println("Текущий пользователь: " + currentUser.getUsername());
+        System.out.println("Роли пользователя: " + currentUser.getRoles());
+
 
         model.addAttribute("username", username);
         model.addAttribute("user", currentUser); // Передаем информацию о текущем пользователе
@@ -42,11 +50,16 @@ public class UserController {
     }
 
     @GetMapping("/user")
-    public String showUserInfo(Model model, Principal principal) {
+    public String userPanel(Model model, Principal principal) {
         // Получаем текущего пользователя
         String username = principal.getName();
-        User user = (User) userService.loadUserByUsername(username);
-        model.addAttribute("user", user);
+        User currentUser = (User) userService.loadUserByUsername(username);
+
+        // Передаем данные в модель
+        model.addAttribute("username", username);
+        model.addAttribute("user", currentUser);
+        model.addAttribute("roles", currentUser.getRoles()); // Передаем роли
+
         return "user";
     }
 
@@ -56,16 +69,9 @@ public class UserController {
         return userService.findById(id);
     }
 
-    @GetMapping("/admin/new")
-    public String newUser(Model model) {
-        model.addAttribute("user", new User());
-        model.addAttribute("allRoles", roleRepository.findAll()); // Передаем все роли
-        return "admin";
-    }
 
     @PostMapping("/admin/new")
     public String create(@ModelAttribute("user") User user, @RequestParam("roleIds") Set<Long> roleIds) {
-        // Получаем роли по их идентификаторам
         Set<Role> roles = new HashSet<>(roleRepository.findAllById(roleIds)); // Преобразуем List в Set
         user.setRoles(roles);
         userService.create(user);
@@ -85,9 +91,20 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return "edit";
         }
-        Set<Role> roles = new HashSet<>(roleRepository.findAllById(roleIds));
+
+        // Получаем роли по их ID из базы данных
+        Set<Role> roles = roleIds.stream()
+                .map(roleId -> roleRepository.findById(roleId).orElseThrow(() -> new RuntimeException("Role not found")))
+                .collect(Collectors.toSet());
+        User existingUser = userService.findById(id);
+
+        // Устанавливаем выбранные роли для пользователя
         user.setRoles(roles);
+        user.setPassword(existingUser.getPassword());
+
+        // Обновляем пользователя
         userService.update(user, id);
+
         return "redirect:/admin";
     }
 

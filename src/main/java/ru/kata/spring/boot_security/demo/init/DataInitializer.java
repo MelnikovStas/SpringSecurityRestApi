@@ -22,7 +22,6 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Удаляем все существующие данные (если они есть)
         userRepository.deleteAll();
         roleRepository.deleteAll();
 
