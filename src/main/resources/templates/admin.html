@@ -99,6 +99,8 @@
                                         <button class="btn btn-danger btn-sm"
                                                 th:data-id="${user.id}"
                                                 th:data-username="${user.username}"
+                                                th:data-age="${user.age}"
+                                                th:data-roles="${#strings.listJoin(user.roles.![authority], ', ')}"
                                                 onclick="openDeleteModal(this)">Удалить</button>
                                     </div>
                                 </td>
@@ -210,7 +212,20 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
             </div>
             <div class="modal-body">
-                <p>Вы уверены, что хотите удалить пользователя <strong id="delete-username"></strong>?</p>
+                <div class="mb-3">
+                    <label for="delete-username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="delete-username" name="username" disabled>
+                </div>
+                <div class="mb-3">
+                    <label for="delete-age" class="form-label">Age</label>
+                    <input type="number" class="form-control" id="delete-age" name="age" disabled>
+                </div>
+                <div class="mb-3">
+                    <label for="delete-roles" class="form-label">Roles</label>
+                    <select class="form-control" id="delete-roles" name="roleIds" multiple disabled>
+                        <!-- Роли будут добавлены динамически через JavaScript -->
+                    </select>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
@@ -277,12 +292,34 @@
     function openDeleteModal(button) {
         const id = button.getAttribute('data-id');
         const username = button.getAttribute('data-username');
+        const age = button.getAttribute('data-age');
+        const roles = button.getAttribute('data-roles');
 
+        // Устанавливаем значения для полей в форме удаления
         document.getElementById('delete-id').value = id;
-        document.getElementById('delete-username').textContent = username;
+        document.getElementById('delete-username').value = username;
+        document.getElementById('delete-age').value = age;
 
+        // Очищаем список ролей перед заполнением
+        const rolesSelect = document.getElementById('delete-roles');
+        rolesSelect.innerHTML = ''; // Очищаем список
+
+        // Разделяем роли пользователя
+        const userRoles = roles.split(', ');
+
+        // Добавляем только те роли, которые есть у пользователя
+        userRoles.forEach(role => {
+            const option = document.createElement('option');
+            option.value = role.replace('ROLE_', ''); // Убираем префикс ROLE_
+            option.text = role.replace('ROLE_', ''); // Убираем префикс ROLE_
+            option.selected = true; // Выделяем роль
+            rolesSelect.appendChild(option);
+        });
+
+        // Устанавливаем действие формы удаления
         document.getElementById('deleteUserForm').action = `/admin/delete?id=${id}`;
 
+        // Открываем модальное окно удаления
         const deleteModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
         deleteModal.show();
     }

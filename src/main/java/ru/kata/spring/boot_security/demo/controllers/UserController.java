@@ -63,11 +63,6 @@ public class UserController {
         return "user";
     }
 
-    @GetMapping("/admin/user")
-    @ResponseBody
-    public User getUserById(@RequestParam Long id) {
-        return userService.findById(id);
-    }
 
 
     @PostMapping("/admin/new")
@@ -78,11 +73,6 @@ public class UserController {
         return "redirect:/admin";
     }
 
-    @GetMapping("/admin/{id}/edit")
-    public String edit(@PathVariable long id, Model model) {
-        model.addAttribute("user", userService.findById(id));
-        return "edit";
-    }
 
     @PostMapping("/admin/edit")
     public String update(@ModelAttribute("user") User user,
@@ -113,4 +103,6 @@ public class UserController {
         userService.delete(id);
         return "redirect:/admin";
     }
+
+
 }
