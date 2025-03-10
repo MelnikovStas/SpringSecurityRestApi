@@ -20,6 +20,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+
     @Transactional
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -29,27 +30,32 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         }
         return user;
     }
+
     @Transactional
     @Override
     public void create(User user) {
         userRepository.save(user);
     }
+
     @Transactional
     @Override
     public void update(User user, long id) {
         user.setId(id);
         userRepository.save(user);
     }
+
     @Transactional
     @Override
     public void delete(long id) {
         userRepository.deleteById(id);
     }
+
     @Transactional
     @Override
     public User findById(long id) {
         return userRepository.findById(id).orElse(null);
     }
+
     @Transactional
     @Override
     public List<User> findAll() {

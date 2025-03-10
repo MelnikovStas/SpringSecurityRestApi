@@ -39,7 +39,7 @@ public class DataInitializer implements CommandLineRunner {
         admin.setUsername("admin");
         admin.setPassword("admin"); // Пароль без кодировки
         admin.setAge(18);
-        admin.setRoles(Set.of(adminRole,userRole));
+        admin.setRoles(Set.of(adminRole, userRole));
         userRepository.save(admin);
 
         // Создаем обычного пользователя
