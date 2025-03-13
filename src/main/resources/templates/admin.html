@@ -431,6 +431,7 @@
                 throw new Error('Ошибка создания пользователя');
             }
             document.getElementById('createUserForm').reset();
+            document.getElementById('users-tab').click();
             await loadUsers(); // Перезагружаем список пользователей
         } catch (error) {
             console.error('Ошибка:', error);
