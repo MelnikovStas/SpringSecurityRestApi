@@ -49,7 +49,7 @@
 <!-- Скрипт для загрузки информации о пользователе -->
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
-        const response = await fetch('/users/current');
+        const response = await fetch('/current');
         const user = await response.json();
 
         document.getElementById('usernameDisplay').textContent = user.username;
